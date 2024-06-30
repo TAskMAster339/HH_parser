@@ -2,8 +2,9 @@ import requests
 from bs4 import BeautifulSoup 
 import fake_useragent 
 import json
+import time
 
-def get_links(text: str, page_number: int = 0):
+def get_links(text: str, start_page: int = 0, end_page: int = 5):
     """Getting a link to resume from hh.ru"""
     ua = fake_useragent.UserAgent()
     data = requests.get(
@@ -15,31 +16,30 @@ def get_links(text: str, page_number: int = 0):
         return
     soup = BeautifulSoup(data.content, 'lxml')
     try:
-        if page_number == 0:
-            number = int(soup.find("div", attrs={"class": "pager"}).find_all("span", recursive=False)[-1].find("a").find("span").text)
-        else:
-            number = page_number
+        max_page = int(soup.find("div", attrs={"class": "pager"}).find_all("span", recursive=False)[-1].find("a").find("span").text)
+        if ((end_page - start_page) > 0 and ((end_page - start_page) < max_page)):
+            for page in range(start_page, end_page, 1): 
+                try:
+                    data = requests.get(
+                        url=f'https://hh.ru/search/resume?text={text}&area=1&isDefaultArea=true&ored_clusters=true&order_by=relevance&search_period=0&logic=normal&pos=full_text&exp_period=all_time&page={page}',
+                        headers={"user-agent": ua.random}
+                    )
+                    if data.status_code != 200:
+                        continue
+
+                    soup = BeautifulSoup(data.content, "lxml")
+                    links = soup.find_all("a", attrs={"class": "bloko-link"})
+
+                    for a in links:
+                        if (len(a["class"]) == 1 and len(a.attrs['href'].split('?')[0]) > 20):  
+                            yield f'https://hh.ru{a.attrs['href'].split('?')[0]}'
+
+                except Exception as e:
+                    print(f"{e}") 
     except:
         return
     
-    for page in range(number): 
-        try:
-            data = requests.get(
-                url=f'https://hh.ru/search/resume?text={text}&area=1&isDefaultArea=true&ored_clusters=true&order_by=relevance&search_period=0&logic=normal&pos=full_text&exp_period=all_time&page={page}',
-                headers={"user-agent": ua.random}
-            )
-            if data.status_code != 200:
-                continue
-
-            soup = BeautifulSoup(data.content, "lxml")
-            links = soup.find_all("a", attrs={"class": "bloko-link"})
-
-            for a in links:
-                if (len(a["class"]) == 1 and len(a.attrs['href'].split('?')[0]) > 20):  
-                    yield f'https://hh.ru{a.attrs['href'].split('?')[0]}'
-
-        except Exception as e:
-            print(f"{e}")
+    
 
 def get_resume(link: str) -> dict | None:
     """ Getting resume data from link
@@ -71,11 +71,11 @@ def get_resume(link: str) -> dict | None:
     try:
         education = soup.find(attrs={"data-qa": "resume-block-education-name"}).text + " " +soup.find(attrs={"data-qa": "resume-block-education-organization"}).text
     except:
-        education = ""
+        education = "undefined"
     try:
-        experience = soup.find(attrs={"class": "resume-block__title-text resume-block__title-text_sub"}).text.replace("\xa0", " ")
+        experience = soup.find(attrs={"data-qa": "resume-block-experience"}).find(attrs={"class": "resume-block__title-text resume-block__title-text_sub"}).text.replace("\xa0", " ")
     except:
-        experience = ""
+        experience = "undefined"
     try:
         languages = [language.text for language in soup.find(attrs={"data-qa": "resume-block-languages"}).find_all(attrs={"class": "bloko-tag__section_text"})]
     except:
@@ -83,7 +83,7 @@ def get_resume(link: str) -> dict | None:
     try:
         about = soup.find(attrs={"data-qa": "resume-block-skills"}).find(attrs={"data-qa": "resume-block-skills-content"}).text.replace("\n", " ")
     except:
-        about = ""
+        about = "undefined"
 
     resume = {
         "name": name,
@@ -114,6 +114,8 @@ def parse_all_vacancies(query_params: dict = {}) -> list[dict]:
     if (query_params): #adding query_params to url
         first_flag: bool = True
         for key in query_params:
+            if query_params[key] == None:
+                continue
             if (first_flag):
                 first_flag = False
             else:

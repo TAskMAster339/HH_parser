@@ -16,11 +16,11 @@ class Resume(Base):
     link=Column(Text)
 
 class Vacancy(Base):
-    __tablename__ = "vacancy"
+    __tablename__ = "vacancies"
 
     id=Column(Integer, primary_key=True)
     name=Column(Text)
-    department=Column(Text)
+    area=Column(Text)
     salary=Column(Text)
     type=Column(Text)
     published_at=Column(Text)
@@ -28,6 +28,6 @@ class Vacancy(Base):
     url=Column(Text)
     requirement=Column(Text)
     responsibility=Column(Text)
-    shedule=Column(Text)
+    schedule=Column(Text)
     experience=Column(Text)
     employment=Column(Text)

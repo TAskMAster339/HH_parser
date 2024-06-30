@@ -47,7 +47,7 @@ async def get_by_id(id:int, db: Session = Depends(get_db)):
 @router.put("/{id}")
 async def update(id: int, request: VacancySchema, db: Session = Depends(get_db)):
     try:
-        _vacancy = controller.update_vacancy(db, vacancy_id=id, name=request.name, department=request.department, salary=request.salary,
+        _vacancy = controller.update_vacancy(db, vacancy_id=id, name=request.name, department=request.department, area=request.area, salary=request.salary,
                                         type=request.type, published_at=request.published_at, created_at=request.created_at, 
                                         url=request.url, requirement=request.requirement, responsibility=request.responsibility,
                                         shedule=request.shedule, experience=request.experience, employment=request.employment)
