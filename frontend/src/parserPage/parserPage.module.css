@@ -1,0 +1,44 @@
+.h1 {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    margin-bottom: 30px;
+}
+.Input {
+    display: block;
+    margin: auto;
+    width: 300px;
+}
+.Radio{
+    margin-top: 10px;
+}
+.h2 {
+    text-align: center;
+    font-size: medium;
+    font-weight: 700;
+    margin-top: 20px;
+}
+p {
+    text-align: center;
+    font-size: small;
+    font-weight: 500;
+}
+h3 {
+    text-align: center;
+    font-size: small;
+    font-weight: 500;
+    margin-top: 10px;
+}
+.btn {
+    display: block;
+    text-align: center;
+    margin: auto;
+    margin-top: 20px;
+    width: 300px;
+}
+.salary{
+    display: flex;
+}
+.attention{
+    font-weight: 700;
+}

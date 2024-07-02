@@ -114,14 +114,13 @@ def parse_all_vacancies(query_params: dict = {}) -> list[dict]:
     if (query_params): #adding query_params to url
         first_flag: bool = True
         for key in query_params:
-            if query_params[key] == None:
+            if query_params[key] == None or query_params[key] == "":
                 continue
             if (first_flag):
                 first_flag = False
             else:
                 url+='&'
             url += f'{key}={query_params[key]}'
-
     req = requests.get(
         url=url,
     )

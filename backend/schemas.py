@@ -65,11 +65,8 @@ class RequestVacancyParsing(BaseModel):
     experience: Optional[str]=None
     employment: Optional[str]=None
     schedule: Optional[str]=None
-    area: Optional[str]=None
     currency: Optional[str]=None
     salary: Optional[str]=None
     only_with_salary: Optional[bool]=None
-    period: Optional[str]=None
     date_from: Optional[str]=None
     date_to: Optional[str]=None
-    locale: Optional[str]=None

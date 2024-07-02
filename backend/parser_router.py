@@ -47,21 +47,18 @@ async def parse_vacancy(request: RequestVacancyParsing, db: Session = Depends(ge
     try:
         query_params = {
             "page": 0,
-            "per_page": request.per_page,
+            "per_page": int(request.per_page),
             "text": request.text,
             "search_field": request.search_field,
             "experience": request.experience,
             "employment": request.employment,
             "schedule": request.schedule,
-            "area": request.area,
             "currency": request.currency,
             "salary": request.salary,
-            "only_with_salary": request.only_with_salary,
-            "period": request.period,
+            "only_with_salary": bool(request.only_with_salary),
             "date_from": request.date_from,
             "date_to": request.date_to,
-            "locale": request.locale
-        }
+        }   
         number_of_pages = request.number_of_pages
         if (number_of_pages * request.per_page >= 2000):
             number_of_pages = 1
@@ -90,7 +87,7 @@ async def parse_vacancy(request: RequestVacancyParsing, db: Session = Depends(ge
                         published_at=str(vacancy["published_at"]),
                         created_at=str(vacancy["created_at"]),
                         url=str(vacancy["url"]),
-                        requirement=str(vacancy["snippet"]["requirement"]),
+                        requirement=str(vacancy["snippet"]["requirement"]).replace("<highlighttext>", " "),
                         responsibility=str(vacancy["snippet"]["responsibility"]),
                         schedule=str(vacancy["schedule"]["name"]),
                         experience=str(vacancy["experience"]["name"]),
@@ -100,7 +97,7 @@ async def parse_vacancy(request: RequestVacancyParsing, db: Session = Depends(ge
                 else:
                     _vacancy = controller.update_vacancy(db, vacancy_id=int(vacancy["id"]),name=str(vacancy["name"]), area=str(vacancy["area"]["name"]),
                         salary=salary, type=str(vacancy["type"]["name"]), published_at=str(vacancy["published_at"]), created_at=str(vacancy["created_at"]),
-                        url=str(vacancy["url"]), requirement=str(vacancy["snippet"]["requirement"]), responsibility=str(vacancy["snippet"]["responsibility"]),
+                        url=str(vacancy["url"]), requirement=str(vacancy["snippet"]["requirement"]).replace("<highlighttext>", " "), responsibility=str(vacancy["snippet"]["responsibility"]),
                         schedule=str(vacancy["schedule"]["name"]), experience=str(vacancy["experience"]["name"]), employment=str(vacancy["employment"]["name"])
                     )
         return Response(code=200, status="Ok", message="Vacancies has been parsed successfully", result=_vacancies).dict(exclude_none=True)
