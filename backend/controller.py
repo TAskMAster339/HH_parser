@@ -2,9 +2,12 @@ from sqlalchemy.orm import Session
 from model import Resume, Vacancy
 from schemas import ResumeSchema, VacancySchema
 
-#Get all
-def get_resume(db: Session, skip: int = 0, limit : int = 100) -> list[Resume]:
+#Get some limit of resume
+def get_limited_resume(db: Session, skip: int = 0, limit : int = 100) -> list[Resume]:
     return db.query(Resume).offset(skip).limit(limit).all()
+#get all resumes
+def get_all_resume(db: Session) -> list[Resume]:
+    return db.query(Resume).all()
 #get one by id
 def get_resume_by_id(db: Session, resume_id: int) -> Resume | None:
     return db.query(Resume).filter(Resume.id == resume_id).first()

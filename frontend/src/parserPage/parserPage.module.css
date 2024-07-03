@@ -42,3 +42,10 @@ h3 {
 .attention{
     font-weight: 700;
 }
+.goBtn{
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin-top: 15px;
+    margin-right: 20px;
+}

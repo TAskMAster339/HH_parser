@@ -7,11 +7,21 @@ import {
 } from "react-router-dom";
 import ParsePage from './parserPage/ParsePage';
 import './index.css';
+import TablePage from './tablePage/TablePage';
+import ErrorPage from './errorPage/ErrorPage';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <ParsePage/>,
+  },
+  {
+    path: "/table",
+    element: <TablePage/>
+  },
+  {
+    path: "/*",
+    element: <ErrorPage/>
   }
 ]);
 

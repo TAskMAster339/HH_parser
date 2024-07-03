@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input, RadioGroup, Radio, Stack,
     Slider, SliderTrack, SliderFilledTrack, SliderThumb,
     Button, Select, NumberInput, NumberInputField,
@@ -7,13 +7,16 @@ import { Input, RadioGroup, Radio, Stack,
  } from '@chakra-ui/react';
 import classes from "./parserPage.module.css";
 import parser from "../API/parser";
+import { useNavigate } from "react-router-dom";
 
 
 const ParsePage = () => {
+    useEffect(() => {getAreaData()}, []); //getting Areas data from api.hh.ru
     const [text, setText] = useState("");
     const [target, setTarget] = useState('resume')
     const [startPage, setStartPage] = useState(0)
     const [endPage, setEndPage] = useState(5)
+    const [areas, setAreas] = useState({})
     const [parsingProcess, setParsingProcess] = useState(false)
     const [parsingResult, setParsingResult] = useState(false)
     const [vacancyData, setVacancyData] = useState({
@@ -21,6 +24,7 @@ const ParsePage = () => {
         per_page: 1, 
         salary: "1", 
         only_with_salary: false,
+        area: "",
         date_from: "",
         date_to: "",
         text: text,
@@ -30,6 +34,11 @@ const ParsePage = () => {
         schedule: "",
         currency: ""
     })
+    const navigate = useNavigate()
+    
+    async function getAreaData(){
+        setAreas((await parser.getAreaData())[0].areas)
+    }
 
     async function parseResume(){
         console.log("parsing has been started")
@@ -54,7 +63,7 @@ const ParsePage = () => {
         console.log("parsing has been started")
         setParsingResult(false);
         setParsingProcess(true);
-        if (vacancyData.salary == 0){
+        if (vacancyData.salary == 1){
             setVacancyData({...vacancyData, salary: ""})
         }
         const res = await parser.parseVacancy(vacancyData);
@@ -67,29 +76,15 @@ const ParsePage = () => {
         }
         setParsingProcess(false);
     }
-    async function parseTest(){
-        console.log("parsing has been started")
-        setParsingResult(false);
-        setParsingProcess(true);
-        const res = await parser.parseVacancy({
-            text: "Python",
-            per_page: 1,
-            number_of_pages: 1,
-            only_with_salary: true,
-            salary: "100000"
-
-        });
-        console.log(res, "succsess");
-        if (res.code === 200){
-            setParsingResult(true);
-        }
-        else if (res.code === 400){
-            console.log("Some parsing error")
-        }
-        setParsingProcess(false);
-    }
     return (
         <div>
+            <Button 
+            className={classes.goBtn}
+            colorScheme='pink'
+            variant='outline'
+            position={'fixed'}
+            onClick={() => {navigate("/table")}}
+            >Go to table page</Button>
             <h1 className={classes.h1}>Parsing page</h1>
             <div className={classes.Input}>
                 <Input
@@ -217,6 +212,15 @@ const ParsePage = () => {
                                                 <option value='project'>Проектная работа</option>
                                                 <option value='volunteer'>Волонтерство</option>
                                                 <option value='probation'>Стажировка</option>
+                                            </Select>
+                                        </div>
+                                        <div>
+                                            <h3>Select area</h3>
+                                            <Select focusBorderColor='pink.400' value={vacancyData.area} onChange={(e) => {setVacancyData({...vacancyData, area: e.target.value})}}>
+                                                <option value=''>---</option>
+                                                {areas.map((item) => (
+                                                    <option key={item.id} value={item.id}>{item.name}</option>
+                                                ))}
                                             </Select>
                                         </div>
                                         <div>

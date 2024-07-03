@@ -14,4 +14,10 @@ export default class parser{
             return res.data
         }catch(error){ console.log(error) }
     }
+    static async getAreaData() {
+        try{
+            const res = await axios.get("https://api.hh.ru/areas")
+            return res.data
+        }catch(error){ console.log(error) }
+    }
 }

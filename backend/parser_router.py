@@ -53,6 +53,7 @@ async def parse_vacancy(request: RequestVacancyParsing, db: Session = Depends(ge
             "experience": request.experience,
             "employment": request.employment,
             "schedule": request.schedule,
+            "area": request.area,
             "currency": request.currency,
             "salary": request.salary,
             "only_with_salary": bool(request.only_with_salary),
