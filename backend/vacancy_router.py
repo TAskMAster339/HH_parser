@@ -25,16 +25,25 @@ async def create(request: VacancySchema, db: Session = Depends(get_db)):
 
 
 @router.get("/")
-async def get(db: Session = Depends(get_db)):
+async def get_all_vacancies(db: Session = Depends(get_db)):
     try:
-        _vacancy = controller.get_vacancies(db, 0, 100)
+        _vacancy = controller.get_all_vacancies(db)
+        return Response(code=200, status="Ok", message="Successfull fetch", result=_vacancy).dict(exclude_none=True)
+    except Exception as e:
+        print(f"{e}")
+        return Response(code=400, status="Not ok", message=f"{e}").dict(exclude_none=True)
+    
+@router.get("/{skip}")
+async def get_limitted_vacancies(skip: int, db: Session = Depends(get_db)):
+    try:
+        _vacancy = controller.get_limitted_vacancies(db, skip, 100)
         return Response(code=200, status="Ok", message="Successfull fetch", result=_vacancy).dict(exclude_none=True)
     except Exception as e:
         print(f"{e}")
         return Response(code=400, status="Not ok", message=f"{e}").dict(exclude_none=True)
     
 
-@router.get("/{id}")
+@router.get("/one/{id}")
 async def get_by_id(id:int, db: Session = Depends(get_db)):
     try:
         _vacancy = controller.get_vacancy_by_id(db, id)

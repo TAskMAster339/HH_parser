@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import classes from "./tablePage.module.css";
 import { Button, Tabs, TabList, TabPanels, Tab, TabPanel,
     Input, Spinner, Select
@@ -6,18 +6,26 @@ import { Button, Tabs, TabList, TabPanels, Tab, TabPanel,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import back from "../API/back";
-import ResumeTable from "./TableItem/ResumeTable";
+import ResumeTable from "./ResumeTable/ResumeTable";
+import VacancyTable from "./VacancyTable/VacancyTable";
 
 
 const TablePage = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+
     const [resumeData, setResumeData] = useState([]);
-    const [searchedResumeData, setSearchedResumeData] = useState([])
-    const [inputData, setInputData] = useState({column: 'name', string: ""});
+    const [searchedResumeData, setSearchedResumeData] = useState([]);
+
+    const [vacancyData, setVacancyData] = useState([]);
+    const [searchedVacancyData, setSearchedVacancyData] = useState([]);
+
+    const [firstInputData, setFirstInputData] = useState({column: 'name', string: ""});
+    const [secondInputData, setSecondInputData] = useState({column: 'name', string: ""});
     const inputRef = useRef(null);
 
     useEffect(() => {getResumes()}, []);
+    useEffect(() => {getVacancy()}, [])
     async function getResumes(){
         try{
             setIsLoading(true);
@@ -29,14 +37,35 @@ const TablePage = () => {
             console.log(e)
         }
     }
+    async function getVacancy(){
+        try{
+            setIsLoading(true);
+            const data = await back.getAllVacancies();
+            setVacancyData(data.result);
+            setSearchedVacancyData(data.result);
+            setIsLoading(false);
+        }catch(e){
+            console.log(e)
+        }
+    }
     let SearchedResumes = resumeData.map((elem) => elem);
     SearchedResumes = useMemo(() => { //очень не отптимизированно, аккуратно с большыми данными
         return SearchedResumes.filter(resume => {  
-            return String((resume[inputData.column])).toLowerCase().includes(inputData.string)}); 
-    }, [inputData.string, SearchedResumes])
-    function updateTable(){
+            return String((resume[firstInputData.column])).toLowerCase().includes(firstInputData.string.toLowerCase())}); 
+    }, [firstInputData.string, SearchedResumes])
+    let SearchedVacancies = vacancyData.map((elem) => elem);
+    SearchedVacancies = useMemo(() => { //очень не отптимизированно, аккуратно с большыми данными
+        return SearchedVacancies.filter(vacancy => {  
+            return String((vacancy[secondInputData.column])).toLowerCase().includes(secondInputData.string.toLowerCase())}); 
+    }, [secondInputData.string, SearchedVacancies])
+    function updateResumeTable(){
         setIsLoading(true);
         setSearchedResumeData(SearchedResumes);
+        setTimeout(() => setIsLoading(false), 500);
+    }
+    function updateVacancyTable(){
+        setIsLoading(true);
+        setSearchedVacancyData(SearchedVacancies);
         setTimeout(() => setIsLoading(false), 500);
     }
     return (
@@ -62,19 +91,20 @@ const TablePage = () => {
                             ref={inputRef}
                             placeholder='Search in ' 
                             focusBorderColor='pink.400'
-                            value={inputData.string}
+                            value={firstInputData.string}
                             borderColor={'pink'} 
                             width={'100vw'}
                             display={'block'}
-                            onChange={(e) => {e.preventDefault(); setInputData({...inputData, string: inputRef.current.value})}}
+                            onChange={(e) => {e.preventDefault(); setFirstInputData({...firstInputData, string: inputRef.current.value})}}
                             />
                             <Select focusBorderColor='pink.400' width={'50vw'} colorScheme="pink"
-                            value={inputData.column} onChange={(e) => {e.preventDefault(); setInputData({...inputData, column: e.target.value})}}
+                            value={firstInputData.column} onChange={(e) => {e.preventDefault(); setFirstInputData({...firstInputData, column: e.target.value})}}
                             >
                                 <option value='id'>id</option>
                                 <option value='link'>link</option>
                                 <option value='name'>name</option>
                                 <option value='experience'>experience</option>
+                                <option value='salary'>salary</option>
                                 <option value='education'>education</option>
                                 <option value='languages'>languages</option>
                                 <option value='tags'>tags</option>
@@ -83,7 +113,7 @@ const TablePage = () => {
                             <Button 
                                 colorScheme='pink'
                                 variant='outline'
-                                onClick={updateTable}
+                                onClick={updateResumeTable}
                                 >Submit</Button>
                         </div>
                     { (!isLoading) ?
@@ -101,7 +131,51 @@ const TablePage = () => {
                     </TabPanel>
 
                     <TabPanel paddingLeft={1} paddingRight={1}>
-
+                        <div className={classes.inputclass}>
+                                <Input
+                                placeholder='Search in ' 
+                                focusBorderColor='pink.400'
+                                value={secondInputData.string}
+                                borderColor={'pink'} 
+                                width={'100vw'}
+                                display={'block'}
+                                onChange={(e) => {e.preventDefault(); setSecondInputData({...secondInputData, string: e.target.value})}}
+                                />
+                                <Select focusBorderColor='pink.400' width={'50vw'} colorScheme="pink"
+                                value={secondInputData.column} onChange={(e) => {e.preventDefault(); setSecondInputData({...secondInputData, column: e.target.value})}}
+                                >
+                                    <option value='id'>id</option>
+                                    <option value='url'>url</option>
+                                    <option value='name'>name</option>
+                                    <option value='area'>area</option>
+                                    <option value='salary'>salary</option>
+                                    <option value='schedule'>schedule</option>
+                                    <option value='experience'>experience</option>
+                                    <option value='employment'>employment</option>
+                                    <option value='type'>type</option>
+                                    <option value='published_at'>published_at</option>
+                                    <option value='created_at'>created_at</option>
+                                    <option value='requirement'>requirement</option>
+                                    <option value='responsibility'>responsibility</option>
+                                </Select>
+                                <Button 
+                                    colorScheme='pink'
+                                    variant='outline'
+                                    onClick={updateVacancyTable}
+                                    >Submit</Button>
+                            </div>
+                        { (!isLoading) ?
+                            <VacancyTable data={searchedVacancyData}/>
+                                :
+                                <Spinner
+                                    thickness='4px'
+                                    speed='0.65s'
+                                    emptyColor='gray.200'
+                                    color='pink.500'
+                                    margin={'auto'}
+                                    display={"block"}
+                                    size='xl'/>
+                            }
                     </TabPanel>
                 </TabPanels>
             </Tabs>

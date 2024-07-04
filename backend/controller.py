@@ -64,9 +64,14 @@ def get_resume_by_link(db: Session, link: str) -> Resume | None:
     return db.query(Resume).filter(Resume.link == link).first()
 
 
-#Get all
-def get_vacancies(db: Session, skip: int = 0, limit: int = 100) -> list[Vacancy]:
+#Get some limit of vacancy
+def get_limitted_vacancies(db: Session, skip: int = 0, limit: int = 100) -> list[Vacancy]:
     return db.query(Vacancy).offset(skip).limit(limit).all()
+
+#Get all vacancy
+def get_all_vacancies(db: Session) -> list[Vacancy]:
+    return db.query(Vacancy).all()
+
 #get one by id
 def get_vacancy_by_id(db: Session, vacancy_id: int) -> Vacancy | None:
     return db.query(Vacancy).filter(Vacancy.id == vacancy_id).first()

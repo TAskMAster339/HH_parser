@@ -29,7 +29,7 @@ async def create(request: RequestResume, db: Session = Depends(get_db)):
 
 
 @router.get("/{skip}")
-async def get(skip:int, db: Session = Depends(get_db)):
+async def get_limitted_resume(skip:int, db: Session = Depends(get_db)):
     try:
         _resume = controller.get_limited_resume(db, skip)
         return Response(code=200, status="Ok", message="Successfull fetch", result=_resume).dict(exclude_none=True)
@@ -38,7 +38,7 @@ async def get(skip:int, db: Session = Depends(get_db)):
         return Response(code=400, status="Not ok", message=f"{e}").dict(exclude_none=True)
     
 @router.get("/")
-async def get(db: Session = Depends(get_db)):
+async def get_all_resume(db: Session = Depends(get_db)):
     try:
         _resume = controller.get_all_resume(db)
         return Response(code=200, status="Ok", message="Successfull fetch", result=_resume).dict(exclude_none=True)
@@ -47,7 +47,7 @@ async def get(db: Session = Depends(get_db)):
         return Response(code=400, status="Not ok", message=f"{e}").dict(exclude_none=True)
     
 
-@router.get("/{id}")
+@router.get("/one/{id}")
 async def get_by_id(id:int, db: Session = Depends(get_db)):
     try:
         _resume = controller.get_resume_by_id(db, id)

@@ -88,8 +88,8 @@ async def parse_vacancy(request: RequestVacancyParsing, db: Session = Depends(ge
                         published_at=str(vacancy["published_at"]),
                         created_at=str(vacancy["created_at"]),
                         url=str(vacancy["url"]),
-                        requirement=str(vacancy["snippet"]["requirement"]).replace("<highlighttext>", " "),
-                        responsibility=str(vacancy["snippet"]["responsibility"]),
+                        requirement=str(vacancy["snippet"]["requirement"]).replace("<highlighttext>", " ").replace("</highlighttext>", " "),
+                        responsibility=str(vacancy["snippet"]["responsibility"]).replace("<highlighttext>", " ").replace("</highlighttext>", " "),
                         schedule=str(vacancy["schedule"]["name"]),
                         experience=str(vacancy["experience"]["name"]),
                         employment=str(vacancy["employment"]["name"])
@@ -98,7 +98,8 @@ async def parse_vacancy(request: RequestVacancyParsing, db: Session = Depends(ge
                 else:
                     _vacancy = controller.update_vacancy(db, vacancy_id=int(vacancy["id"]),name=str(vacancy["name"]), area=str(vacancy["area"]["name"]),
                         salary=salary, type=str(vacancy["type"]["name"]), published_at=str(vacancy["published_at"]), created_at=str(vacancy["created_at"]),
-                        url=str(vacancy["url"]), requirement=str(vacancy["snippet"]["requirement"]).replace("<highlighttext>", " "), responsibility=str(vacancy["snippet"]["responsibility"]),
+                        url=str(vacancy["url"]), requirement=str(vacancy["snippet"]["requirement"]).replace("<highlighttext>", " ").replace("</highlighttext>", " "), 
+                        responsibility=str(vacancy["snippet"]["responsibility"]).replace("<highlighttext>", " ").replace("</highlighttext>", " "),
                         schedule=str(vacancy["schedule"]["name"]), experience=str(vacancy["experience"]["name"]), employment=str(vacancy["employment"]["name"])
                     )
         return Response(code=200, status="Ok", message="Vacancies has been parsed successfully", result=_vacancies).dict(exclude_none=True)
