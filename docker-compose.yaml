@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  back:
+    container_name: backend
+    build: ./backend
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/src/backend
+    ports:
+      - "8000:8000"
+    restart: always
+    env_file:
+      - .env
+      
+  db:
+    container_name: postgres_container
+    image: postgres:15.6
+    environment:
+      - hostname=${HOSTNAME}
+      - POSTGRES_DB=${POSTGRESS_DB_NAME}
+      - POSTGRES_USER=${POSTGRES_DB_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRESS_DB_PASSWORD}
+    ports:
+      - "${POSTGRESS_DB_HOST_PORT}:5432"
+    volumes:
+      - .postgres:/var/lib/postgres/data
+    restart: always
+    env_file:
+      - .env
+
+  front:
+    container_name: frontend
+    build: ./frontend
+    depends_on:
+      - back
+    volumes:
+      - ./frontend:/src/frontend
+    ports:
+      - "3000:3000"
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - 5050:80
+    env_file:
+      - .env
